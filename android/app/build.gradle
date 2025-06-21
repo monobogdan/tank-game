@@ -1,0 +1,53 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 21
+    sourceCompatibility = 1.5
+    targetCompatibility = 1.5
+    buildToolsVersion "25.0.0"
+
+    task prepareData(type: Exec) {
+        workingDir "../../"
+        commandLine "java", "-jar", "tools.jar",  "-copydata"
+    }
+
+    task cleanAssets(type: Delete) {
+        delete "src/main/assets/"
+    }
+
+    /* Copy data files */
+    task copyData(type: Copy, description: "Copy data") {
+        from "../../data/gamedata/"
+        into "src/main/assets/"
+    }
+
+    tasks.withType(JavaCompile) {
+        compileTask -> compileTask.dependsOn cleanAssets, prepareData, copyData
+    }
+
+    defaultConfig {
+        applicationId "com.monobogdan.minisquadron"
+        minSdkVersion 4
+        targetSdkVersion 4
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets {
+        main {
+            java.srcDirs += "../../enginesrc/"
+            java.srcDirs += "../../gamesrc/"
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+}

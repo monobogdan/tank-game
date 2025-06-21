@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: com.monobogdan.engine.desktop.Main
+Class-Path: lwjgl.jar
+

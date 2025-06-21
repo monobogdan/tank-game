@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="scripts:jar">
+    <output-path>$PROJECT_DIR$/build/win32/</output-path>
+    <root id="archive" name="scripts.jar">
+      <element id="module-output" name="scripts" />
+    </root>
+  </artifact>
+</component>

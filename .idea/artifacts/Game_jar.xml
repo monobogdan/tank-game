@@ -1,0 +1,15 @@
+<component name="ArtifactManager">
+  <artifact build-on-make="true" name="Game:jar">
+    <output-path>$PROJECT_DIR$/build/win32/</output-path>
+    <root id="root">
+      <element id="archive" name="Game.jar">
+        <element id="directory" name="META-INF">
+          <element id="file-copy" path="$PROJECT_DIR$/pc/META-INF/MANIFEST.MF" />
+        </element>
+        <element id="module-output" name="MiniSquadron" />
+        <element id="extracted-dir" path="$PROJECT_DIR$/build/win32/lwjgl.jar" path-in-jar="/" />
+      </element>
+      <element id="library" level="project" name="lwjgl" />
+    </root>
+  </artifact>
+</component>
