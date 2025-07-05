@@ -1,6 +1,5 @@
 package com.monobogdan.engine.desktop;
 
-import com.monobogdan.engine.Game;
 import com.monobogdan.engine.Graphics;
 import com.monobogdan.engine.Input;
 import com.monobogdan.engine.Runtime;
@@ -10,6 +9,7 @@ import org.lwjgl.opengl.*;
 import org.lwjgl.opengl.DisplayMode;
 
 import java.io.*;
+import java.util.Properties;
 
 public class Context implements com.monobogdan.engine.Runtime.Platform, Thread.UncaughtExceptionHandler {
     public static String LOG_FILENAME = "game.log";
@@ -47,7 +47,7 @@ public class Context implements com.monobogdan.engine.Runtime.Platform, Thread.U
         }
 
         graphics = new Graphics(this);
-        input = new Input();
+        input = new Input(this);
 
         Runtime = new Runtime(this);
     }
@@ -70,8 +70,10 @@ public class Context implements com.monobogdan.engine.Runtime.Platform, Thread.U
 
         Runtime.init();
         while(!Display.isCloseRequested()) {
+            Runtime.beginFrame();
             Display.processMessages();
 
+            Runtime.Input.update();
             Runtime.Graphics.setViewport(Display.getWidth(), Display.getHeight());
 
             Runtime.update();
@@ -82,6 +84,7 @@ public class Context implements com.monobogdan.engine.Runtime.Platform, Thread.U
             } catch (LWJGLException e) {
                 log("SwapBuffers failed");
             }
+            Runtime.endFrame();
         }
 
         Runtime.releaseResources();

@@ -1,5 +1,8 @@
 package com.monobogdan.engine;
 
+import com.monobogdan.engine.BaseTexture;
+import com.monobogdan.engine.Runtime;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -7,6 +10,7 @@ import java.nio.FloatBuffer;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.*;
 import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL13.*;
 import static org.lwjgl.opengl.EXTBgra.*;
 import static org.lwjgl.opengl.EXTTextureCompressionS3TC.*;
 import static org.lwjgl.opengl.SGISGenerateMipmap.*;
@@ -40,6 +44,14 @@ public class Texture2D extends BaseTexture {
         if(ID == 0)
             throw new RuntimeException("Attempt to bind unassigned texture " + Name);
 
+        glBindTexture(GL_TEXTURE_2D, ID);
+    }
+
+    public void bind(int sampler) {
+        if(ID == 0)
+            throw new RuntimeException("Attempt to bind unassigned texture " + Name);
+
+        glClientActiveTexture(GL_TEXTURE0 + sampler);
         glBindTexture(GL_TEXTURE_2D, ID);
     }
 

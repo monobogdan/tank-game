@@ -2,12 +2,9 @@ package com.monobogdan.engine.world;
 
 import com.monobogdan.engine.*;
 import com.monobogdan.engine.Runtime;
+import com.monobogdan.engine.Graphics;
 
-import java.io.DataOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ArrayBlockingQueue;
 
 public class World {
     private static final int WORLD_HEADER = 0x1337;
@@ -26,6 +23,7 @@ public class World {
     public HashMap<String, String> Information; // Meta-data
     public Camera Camera;
     public Vector<GameObject> GameObjects;
+    public StaticBatchManager BatchManager;
 
     // Package-private fields
     public int LightCounter;
@@ -43,6 +41,8 @@ public class World {
 
         Information = new HashMap<String, String>();
         Information.put("sky", "default");
+
+        BatchManager = new StaticBatchManager(this);
 
         setupRenderPasses();
     }
@@ -81,30 +81,62 @@ public class World {
         return objectRegistry;
     }
 
+    int pass = 0;
     public void update() {
-        Camera.updateProjection();
-        Camera.calculateVectors();
-
-        for(GameObject obj : GameObjects)
+        for(int i = 0; i < GameObjects.size(); i++) {
+            GameObject obj = GameObjects.get(i);
             obj.onUpdate();
+        }
 
         // Second pass for late objects
-        for(GameObject obj : GameObjects)
-            obj.onLateUpdate();
+        for(int i = 0; i < GameObjects.size(); i++)
+            GameObjects.get(i).onLateUpdate();
 
-        GameObjects.addAll(spawnQueue); // Thread safety?
-        GameObjects.removeAll(removalQueue);
-        spawnQueue.clear();
-        removalQueue.clear();
+        if(spawnQueue.size() > 0) {
+            GameObjects.addAll(spawnQueue); // Thread safety?
+            spawnQueue.clear();
+        }
+        if(removalQueue.size() > 0) {
+            GameObjects.removeAll(removalQueue);
+            removalQueue.clear();
+        }
+
+        pass++;
+    }
+
+    public <T extends GameObject> T findObjectWithName(Class<T> clazz, String name) {
+        for(int i = 0; i < GameObjects.size(); i++) {
+            GameObject obj = GameObjects.get(i);
+
+            if(obj.Name.equals(name) && clazz.isAssignableFrom(obj.getClass()))
+                return (T) obj;
+        }
+
+        return null;
+    }
+
+    public <T extends Component> void findComponentsOfType(Class<T> clazz, ArrayList<T> target) {
+        for(int i = 0; i < GameObjects.size(); i++) {
+            GameObject obj = GameObjects.get(i);
+            T t = obj.getComponent(clazz);
+
+            if(t != null)
+                target.add(t);
+        }
     }
 
     public void draw() {
+        Camera.updateProjection();
+        Camera.calculateVectors();
+
         // Light pre-pass
         for(int i = 0; i < contributingLights.size(); i++)
             Runtime.Graphics.setLightSource(i, contributingLights.get(i).Light);
 
-        for(BaseGraphics.RenderPass pass : worldRenderPasses)
+        for(int i = 0; i < worldRenderPasses.size(); i++) {
+            BaseGraphics.RenderPass pass = worldRenderPasses.get(i);
             Runtime.Graphics.doPass(pass.getClass().getSimpleName(), pass);
+        }
     }
 
     private void setupRenderPasses() {
@@ -115,8 +147,10 @@ public class World {
             public void onRender(Graphics graphics, String passName) {
                 graphics.clear(0, 0, 1);
 
-                for(GameObject obj : GameObjects)
-                    obj.onDraw(graphics, Camera, 0);
+                for(int i = 0; i < GameObjects.size(); i++)
+                    GameObjects.get(i).onDraw(graphics, Camera, 0);
+
+                BatchManager.draw(graphics, Camera);
             }
         });
     }

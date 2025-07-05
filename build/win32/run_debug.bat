@@ -1,1 +1,1 @@
-java -jar Game.jar ../../data/
+java -jar Game.jar ../../data/gamedata/

@@ -1,17 +1,19 @@
 package com.monobogdan.engine;
 
 import com.monobogdan.engine.math.BoundingBox;
+import com.monobogdan.engine.math.Color;
 import com.monobogdan.engine.math.Vector;
 
 import java.io.DataInputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.WeakHashMap;
 
-public abstract class BaseMesh {
+public abstract class BaseMesh extends NamedResource {
     public static class Vertex {
         public float X;
         public float Y;
@@ -64,6 +66,69 @@ public abstract class BaseMesh {
         }
     }
 
+    /***
+     * Used for 2D
+     */
+    public static class UIVertex {
+        public float X;
+        public float Y;
+        public float Z;
+
+        public float R, G, B, A;
+
+        public float U;
+        public float V;
+
+        public static final int Size = 36;
+
+        public UIVertex(float x, float y, float z, float nx, float ny, float nz, float r, float g, float b, float a, float u, float v) {
+            X = x;
+            Y = y;
+            Z = z;
+
+            R = r;
+            G = g;
+            B = b;
+            A = a;
+
+            U = u;
+            V = v;
+        }
+
+        public UIVertex(float x, float y, float z, float u, float v) {
+            X = x;
+            Y = y;
+            Z = z;
+
+            U = u;
+            V = v;
+        }
+
+        public UIVertex setPosition(float x, float y, float z) {
+            X = x;
+            Y = y;
+            Z = z;
+
+            return this;
+        }
+
+        public UIVertex setColor(float r, float g, float b, float a) {
+            R = r;
+            G = g;
+            B = b;
+            A = a;
+
+            return this;
+        }
+
+        public UIVertex setUV(float u, float v) {
+            U = u;
+            V = v;
+
+            return this;
+        }
+    }
+
     public static class VertexBuffer {
         public String Name;
         public Vertex[] Vertices;
@@ -76,7 +141,7 @@ public abstract class BaseMesh {
         }
     }
 
-    public class TriangleList {
+    public static class TriangleList {
         public int Offset;
         public int VertexBufferOffset;
         public int Count;
@@ -88,13 +153,23 @@ public abstract class BaseMesh {
     public int VertexBufferID;
     public int IndexBufferID;
 
-    public HashMap<String, TriangleList> TriangleLists;
+    public VertexBuffer[] Buffers;
+    public HashMap<String, TriangleList> TriangleLists = new HashMap<String, TriangleList>(4);
+    public ArrayList<TriangleList> LinearList = new ArrayList<TriangleList>(4);
+
+
+    public BaseMesh(Runtime runtime, String name) {
+        super(runtime, name);
+    }
 
     public BaseMesh(Runtime runtime, VertexBuffer[] buffers, String name) {
+        super(runtime, name);
+
         if(buffers == null)
             throw new RuntimeException("VertexBuffer is null for mesh " + name);
 
-        TriangleLists = new HashMap<String, TriangleList>();
+        Buffers = buffers;
+
         int offset = 0;
         int indexOffset = 0;
 
@@ -104,6 +179,7 @@ public abstract class BaseMesh {
             list.Count = buffers[i].Indices.length;
             list.VertexBufferOffset = offset;
             TriangleLists.put(buffers[i].Name, list);
+            LinearList.add(list);
 
             offset += buffers[i].Vertices.length;
             indexOffset += buffers[i].Indices.length;

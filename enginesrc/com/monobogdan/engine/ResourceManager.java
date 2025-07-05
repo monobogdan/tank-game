@@ -1,5 +1,7 @@
 package com.monobogdan.engine;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 
@@ -58,5 +60,16 @@ public class ResourceManager {
         }
 
         return mesh;
+    }
+
+    public Material getMaterial(String name) {
+        Material material = (Material) getNamedObject(name, Material.class);
+
+        if(material == null) {
+            material = MaterialLoader.load(runtime, name);
+            addObjectToPool(name, material);
+        }
+
+        return material;
     }
 }

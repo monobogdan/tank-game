@@ -1,10 +1,24 @@
 package com.monobogdan.engine;
 
-public class Material {
-    public String Name;
+public class Material extends NamedResource {
+    public static class ShaderInstance {
+        public BaseGraphics.FixedFunctionShader Shader;
+        public float[] Params;
 
-    public Texture2D Diffuse;
-    public Texture2D Detail;
+        public ShaderInstance(BaseGraphics.FixedFunctionShader shader, float[] params) {
+            Shader = shader;
+            Params = params;
+        }
+    }
+    public static final int COMBINER_STAGE_COUNT = 4; // Default to desktop OpenGL
+
+    public ShaderInstance[] Shaders;
+    public Texture2D[] Textures;
+
+    //public Shader Shader;
+
+    //public Texture2D Diffuse;
+    //public Texture2D Detail;
     public float R;
     public float G;
     public float B;
@@ -16,10 +30,13 @@ public class Material {
     public boolean DepthTest;
     public boolean AlphaBlend;
     public boolean AlphaTest;
+    public boolean Fog;
 
     public boolean Unlit;
 
-    public Material(String name) {
+    public Material(Runtime runtime, String name) {
+        super(runtime, name);
+
         R = 1;
         G = 1;
         B = 1;
@@ -31,27 +48,28 @@ public class Material {
         DepthTest = true;
         AlphaBlend = false;
         AlphaTest = false;
+
+        Textures = new Texture2D[COMBINER_STAGE_COUNT];
     }
 
-    public static Material createDiffuse(String name, Texture2D diffuse) {
-        Material material = new Material(name);
-        material.Diffuse = diffuse;
+    public static Material createDiffuse(Runtime runtime, String name, Texture2D diffuse) {
+        Material material = new Material(runtime, name);
+        material.Shaders = new ShaderInstance[] {
+           new ShaderInstance(FFPShaders.ShaderHashMap.get("multiply"), new float[] { 0 })
+        };
+        material.Textures[0] = diffuse;
+        //material.Diffuse = diffuse;
 
         return material;
     }
 
-    public static Material createColor(String name, float r, float g, float b, float a) {
-        Material material = new Material(name);
+    public static Material createColor(Runtime runtime, String name, float r, float g, float b, float a) {
+        Material material = new Material(runtime, name);
         material.R = r;
         material.G = g;
         material.B = b;
         material.A = a;
 
         return material;
-    }
-
-    @Override
-    public String toString() {
-        return Name + hashCode();
     }
 }

@@ -35,6 +35,7 @@ public class BitmapFont {
             throw new IllegalArgumentException("size can't be less than 1");
 
         Pages = pages;
+        Size = size;
         chrHashMap = characters;
         questionMark = chrHashMap.get('?');
 

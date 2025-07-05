@@ -1,5 +1,8 @@
 package com.monobogdan.engine;
 
+import com.monobogdan.engine.ui.DebugUI;
+import com.monobogdan.engine.ui.UI;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -11,7 +14,7 @@ public class Runtime {
     public interface Platform {
         String getName();
 
-        Graphics getGraphics();
+        com.monobogdan.engine.Graphics getGraphics();
         Input getInput();
 
         void log(String fmt, Object... args);
@@ -22,16 +25,18 @@ public class Runtime {
 
     public static final int ENGINE_VERSION = 100;
 
-    Thread MainThread;
+    Thread MainThread = Thread.currentThread();
 
     public Platform Platform;
-    public Graphics Graphics;
+    public com.monobogdan.engine.Graphics Graphics;
     public Input Input;
     public ResourceManager ResourceManager;
     public TaskScheduler Scheduler;
     public Time Time;
+    public UI UI;
 
     public com.monobogdan.game.Game Game;
+    private DebugUI debugUI;
 
     // Game is not supplied if we in editor mode
     public Runtime(Platform platform) {
@@ -48,18 +53,27 @@ public class Runtime {
         Scheduler = new TaskScheduler(this);
         Time = new Time();
         ResourceManager = new ResourceManager(this);
+        UI = new UI(this);
 
         platform.log("Initialization succeed");
 
         this.Game = new com.monobogdan.game.Game(this);
+        debugUI = new DebugUI(this);
     }
 
     public void init() {
         Game.init();
     }
 
-    public void update() {
+    public void beginFrame() {
         Time.update();
+    }
+
+    public void endFrame() {
+        Time.endUpdate();
+    }
+
+    public void update() {
         Scheduler.update(); // Do main thread jobs
 
         Game.update();
@@ -67,7 +81,9 @@ public class Runtime {
 
     public void draw() {
         Game.draw();
-        Time.endUpdate();
+        Game.drawUI();
+        debugUI.draw();
+        Graphics.FrameStatistics.reset(); // TODO: Move to some BeginScene/EndScene
     }
 
     // Do not call directly

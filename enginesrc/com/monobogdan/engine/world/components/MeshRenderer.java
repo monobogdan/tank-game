@@ -1,17 +1,15 @@
 package com.monobogdan.engine.world.components;
 
-import com.monobogdan.engine.Camera;
-import com.monobogdan.engine.Graphics;
-import com.monobogdan.engine.Material;
-import com.monobogdan.engine.Mesh;
+import com.monobogdan.engine.*;
 import com.monobogdan.engine.math.Matrix;
 import com.monobogdan.engine.math.Vector;
 import com.monobogdan.engine.world.Component;
 
-public class MeshRenderer extends Component {
+public class MeshRenderer extends Renderer {
     public Mesh Mesh;
-    public Material Material;
+    public com.monobogdan.engine.Material Material;
 
+    public boolean CanBeOccluded = true;
     public boolean CastsShadow;
     public ShadowCaster ShadowCaster;
 
@@ -49,7 +47,8 @@ public class MeshRenderer extends Component {
             if(CastsShadow && ShadowCaster != null)
                 ShadowCaster.onDrawShadow(Mesh, graphics, camera, renderPassFlags);
 
-            graphics.drawMesh(Mesh, Material, Matrix, camera);
+            if(!CanBeOccluded || camera.Frustum.isMeshRendererInFrustum(this))
+                graphics.drawMesh(Mesh, Material, Matrix, camera);
         }
     }
 }

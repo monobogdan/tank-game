@@ -1,12 +1,12 @@
 package com.monobogdan.engine;
 
-enum TextureWrap {
-    Clamp,
-    Repeat,
-    Unknown;
-}
-
 public class BaseTexture {
+    public enum TextureWrap {
+        Clamp,
+        Repeat,
+        Unknown;
+    }
+
     public static final int FORMAT_RGB = 0;
     public static final int FORMAT_RGBA = 1;
     public static final int FORMAT_RGB565 = 2;

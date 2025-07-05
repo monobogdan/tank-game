@@ -1,8 +1,9 @@
 package com.monobogdan.engine.world;
 
 import com.monobogdan.engine.*;
-import com.monobogdan.engine.math.Matrix;
 import com.monobogdan.engine.math.Vector;
+import com.monobogdan.engine.Graphics;
+import com.monobogdan.engine.world.components.BatchedMeshRenderer;
 import com.monobogdan.engine.world.components.MeshRenderer;
 
 public class StaticMesh extends GameObject {
@@ -11,8 +12,15 @@ public class StaticMesh extends GameObject {
     public Vector Rotation = new Vector();
     public Vector Scale = new Vector(1, 1, 1);
 
-    public StaticMesh() {
-        MeshRenderer = attachComponent(MeshRenderer.class);
+    private Vector oldRotation = new Vector(999, 999, 999), oldPosition = new Vector(-999, -999, 999);
+
+    public StaticMesh(boolean canBeBatched) {
+        super();
+
+        if(!canBeBatched)
+            MeshRenderer = attachComponent(com.monobogdan.engine.world.components.MeshRenderer.class);
+        else
+            MeshRenderer = attachComponent(BatchedMeshRenderer.class);
     }
 
     @Override
@@ -31,7 +39,8 @@ public class StaticMesh extends GameObject {
     public void onUpdate() {
         super.onUpdate();
 
-        MeshRenderer.setTransform(Position, Rotation);
+        if(!Position.compare(oldPosition) || !Rotation.compare(oldRotation))
+            MeshRenderer.setTransform(Position, Rotation);
     }
 
     @Override

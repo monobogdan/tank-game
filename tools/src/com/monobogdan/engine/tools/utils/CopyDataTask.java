@@ -7,7 +7,7 @@ public class CopyDataTask {
     public static final String DATA_SOURCE = "data/";
     public static final String DATA_PREPARED = "data/gamedata/";
 
-    private static String[] sourceFiles = { "bmp", "png", "jpg", "jpeg", "tga", "obj", "fbx", "mtl", "fnt" };
+    private static String[] sourceFiles = { "bmp", "png", "jpg", "jpeg", "tga", "obj", "dae", "fbx", "fnt" };
     private static byte[] buffer = new byte[4096000];
 
     private static void recursiveDelete(String dir) {

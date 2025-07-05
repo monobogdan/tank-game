@@ -58,9 +58,9 @@ public class ResourceThread {
             }
 
             if(innerException != null)
-                runtime.Platform.logException(innerException);
+                throw new RuntimeException("Worker thread thrown an exception", innerException);
 
-            return innerException == null;
+            return true;
         }
 
         public String getLoadingStage() {

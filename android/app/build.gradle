@@ -4,7 +4,7 @@ android {
     compileSdkVersion 21
     sourceCompatibility = 1.5
     targetCompatibility = 1.5
-    buildToolsVersion "25.0.0"
+    buildToolsVersion "29.0.0"
 
     task prepareData(type: Exec) {
         workingDir "../../"

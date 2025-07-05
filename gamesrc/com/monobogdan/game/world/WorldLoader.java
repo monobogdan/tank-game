@@ -4,6 +4,7 @@ import com.monobogdan.engine.ResourceThread;
 import com.monobogdan.engine.Runtime;
 import com.monobogdan.engine.math.Vector;
 import com.monobogdan.engine.world.*;
+import com.monobogdan.game.Game;
 import com.monobogdan.game.objects.PlayerTank;
 import com.monobogdan.game.objects.Point;
 import com.monobogdan.game.objects.StaticObject;
@@ -21,10 +22,10 @@ public class WorldLoader {
 
     private WorldLoader() { }
 
-    public ResourceThread.AsyncResult load(final Runtime runtime, final World world, final String worldName) {
-        runtime.Platform.log("Loading world \"%s\"", worldName);
+    public ResourceThread.AsyncResult load(final Game game, final World world, final String worldName) {
+        game.Runtime.Platform.log("Loading world \"%s\"", worldName);
 
-        return ResourceThread.start(runtime, new ResourceThread.LoadingWorker() {
+        return ResourceThread.start(game.Runtime, new ResourceThread.LoadingWorker() {
             @Override
             public void onBeforeLoad(ResourceThread.AsyncResult res) {
 
@@ -47,7 +48,7 @@ public class WorldLoader {
                 if(obj.equals("StaticObject")) {
                     checkParameterCount(obj, values, 2);
 
-                    ret = new StaticObject(values[0].equals("1"), values[1], values[2]);
+                    ret = new StaticObject(values[0].equals("1"), values[3].equals("1"), values[1], values[2]);
                 }
 
                 if(ret != null)
@@ -59,25 +60,25 @@ public class WorldLoader {
             @Override
             public void onLoad(ResourceThread.AsyncResult res) {
                 try {
-                    InputStream strm = runtime.Platform.openFile("maps/" + worldName + ".map");
+                    InputStream strm = game.Runtime.Platform.openFile("maps/" + worldName + ".map");
 
                     res.setProgressStage("parsing");
                     res.setProgress(0);
-                    runtime.Platform.log("Entered state: Parsing");
+                    game.Runtime.Platform.log("Entered state: Parsing");
 
                     final ArrayList<GameObject> objects = new ArrayList<GameObject>();
 
                     WorldParser.parse(strm, new WorldParser.ParserImplementation() {
                         @Override
                         public void processTag(String tag, String value) {
-                            runtime.Platform.log("Tag %s %s", tag, value);
+                            game.Runtime.Platform.log("Tag %s %s", tag, value);
                         }
 
                         @Override
                         public void processGameObject(String obj, Vector position, Vector rotation, String[] values) {
                             GameObject gameObject = spawnGameObject(obj, position, rotation, values);
                             if(gameObject == null) {
-                                runtime.Platform.log("Unknown GameObject %s", obj);
+                                game.Runtime.Platform.log("Unknown GameObject %s", obj);
                                 return;
                             }
 
@@ -88,7 +89,7 @@ public class WorldLoader {
 
                     res.setProgressStage("loadingAssets");
                     res.setProgress(30);
-                    runtime.Platform.log("Entered state: Loading assets");
+                    game.Runtime.Platform.log("Entered state: Loading assets");
 
                     int totalObjects = objects.size();
                     int currObject = 0;
@@ -107,23 +108,25 @@ public class WorldLoader {
                     sun.Light.Diffuse = Vector.fromColor(253, 251, 211);
                     sun.Light.Position = new Vector(0.5f, 0.2f, 0.3f);
 
-                    // Spawn player
-                    PlayerTank player = new PlayerTank();
-                    player.attachToWorld(world);
-                    player.Position = new Vector(0, 0, -10);
-                    player.loadResources();
-                    objects.add(player);
+                    // Spawz`n player
+                    game.Player = new PlayerTank();
+                    game.Player.attachToWorld(world);
+                    game.Player.Position = new Vector(0, 0, -10);
+                    game.Player.loadResources();
+                    objects.add(game.Player);
                     objects.add(sun);
 
-                    runtime.Scheduler.runOnMainThread(new Runnable() {
+                    game.Runtime.Scheduler.runOnMainThread(new Runnable() {
                         @Override
                         public void run() {
                             for(GameObject obj : objects)
                                 world.spawn(obj);
+
+                            world.BatchManager.bake();
                         }
                     });
 
-                    runtime.Platform.log("Entered state: Done");
+                    game.Runtime.Platform.log("Entered state: Done");
 
                     strm.close();
                 } catch (IOException e) {

@@ -28,7 +28,9 @@ public class CollisionHolder extends Component {
     }
 
     public GameObject isIntersectingWithAnyone(int tag) {
-        for(GameObject obj : Parent.World.GameObjects) {
+        for(int i = 0; i < Parent.World.GameObjects.size(); i++) {
+            GameObject obj = Parent.World.GameObjects.get(i);
+
             if(obj != Parent) {
                 CollisionHolder holder = obj.getComponent(CollisionHolder.class);
 

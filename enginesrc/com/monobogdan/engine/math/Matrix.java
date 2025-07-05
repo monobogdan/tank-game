@@ -26,7 +26,7 @@ public final class Matrix {
     }
 
     public void identity() {
-        Matrix = identity.clone();
+        System.arraycopy(identity, 0, Matrix, 0, 16);
     }
 
     public void multiply(Matrix matrix) {
@@ -37,9 +37,13 @@ public final class Matrix {
         return matrix[y * 4 + x];
     }
 
+    public void copyTo(Matrix matrix) {
+        System.arraycopy(Matrix, 0, matrix.Matrix, 0, 16);
+    }
+
     // TODO: Inline matrix multiplication to make code faster
     public void multiply(float[] matrix) {
-        tmpMatrix = Matrix.clone();
+        System.arraycopy(Matrix, 0, tmpMatrix, 0, 16);
 
         for (int j = 0; j < 4; j++) {
             for (int i = 0; i < 4; i++) {

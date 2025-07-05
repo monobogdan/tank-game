@@ -26,6 +26,12 @@ public class Vector {
         Z += b.Z;
     }
 
+    public void add(float x, float y, float z) {
+        X += x;
+        Y += y;
+        Z += z;
+    }
+
     public void subtract(Vector b) {
         X = X - b.X;
         Y = Y - b.Y;
@@ -40,6 +46,10 @@ public class Vector {
 
     public boolean compare(Vector v, float epsilon) {
         return MathUtils.abs(X - v.X) < epsilon && MathUtils.abs(Y - v.Y) < epsilon && MathUtils.abs(Z - v.Z) < epsilon;
+    }
+
+    public boolean compare(Vector v) {
+        return X == v.X && Y == v.Y && Z == v.Z;
     }
 
     public Vector multiply(Matrix matrix) {
@@ -97,7 +107,7 @@ public class Vector {
     public void normalize() {
         float magnitude = magnitude();
 
-        if(magnitude > EPSILON) {
+        if (magnitude > EPSILON) {
             X /= magnitude;
             Y /= magnitude;
             Z /= magnitude;

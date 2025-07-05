@@ -1,0 +1,20 @@
+
+
+[Texture]
+Primary = textures/t72_diffuse.tex
+Secondary = textures/brick.tex
+
+[RenderStates]
+AlphaTest = 0
+AlphaTestValue = 1
+
+DepthWrite = 1
+DepthTest = 1
+AlphaBlend = 0
+Fog = 1
+Unlit = 1
+
+[Combiners]
+Sample Primary
+Interpolate Secondary 0.4
+MultiplyColor Primary

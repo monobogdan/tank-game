@@ -1,11 +1,6 @@
 package com.monobogdan.engine;
 
 import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Hashtable;
 
 class MeshLoader {
     private static final int HEADER = 0x1234;

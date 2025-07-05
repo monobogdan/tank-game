@@ -1,0 +1,16 @@
+
+[Texture]
+Primary = textures/floor.tex
+
+[RenderStates]
+AlphaTest = 0
+AlphaTestValue = 1
+
+DepthWrite = 1
+DepthTest = 1
+AlphaBlend = 0
+Fog = 1
+Unlit = 1
+
+[Combiners]
+Multiply Primary

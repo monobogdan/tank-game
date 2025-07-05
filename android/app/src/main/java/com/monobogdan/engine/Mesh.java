@@ -15,6 +15,10 @@ public class Mesh extends BaseMesh {
         super(runtime, buffers, name);
     }
 
+    public Mesh(Runtime runtime, String name) {
+        super(runtime, name);
+    }
+
     public void bind() {
         if(VertexBufferID == 0)
             throw new RuntimeException("Attempt to bind non-initialized vertex buffer");

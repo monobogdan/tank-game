@@ -1,0 +1,8 @@
+# Format:
+# Blocks:
+#   <Material name> <Health (standard shot deal 100 damage, 0 means unbreakable)>
+#
+
+Blocks:
+    brick.mtl 100
+    steel.mtl 100

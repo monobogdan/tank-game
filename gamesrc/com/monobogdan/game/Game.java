@@ -3,24 +3,24 @@ package com.monobogdan.game;
 import com.monobogdan.engine.*;
 import com.monobogdan.engine.Runtime;
 import com.monobogdan.engine.math.Vector;
-import com.monobogdan.engine.ui.BitmapFont;
+import com.monobogdan.engine.Mesh;
+import com.monobogdan.engine.Texture2D;
 import com.monobogdan.engine.world.World;
-import com.monobogdan.engine.world.WorldParser;
 import com.monobogdan.game.objects.PlayerTank;
+import com.monobogdan.game.ui.TouchGamepad;
 import com.monobogdan.game.world.WorldLoader;
 
 public class Game {
     public Runtime Runtime;
-
-    private BaseGraphics.RenderPass mainPass;
+    public PlayerTank Player;
+    public TouchGamepad TouchGamepad; // TODO: Split input manager
+    public InputManager InputManager;
 
     private Mesh mesh;
     private Texture2D tex;
 
     private Mesh[] meshes;
     private ResourceThread.AsyncResult loadingResult;
-
-    private BitmapFont font;
 
     private World world;
 
@@ -33,27 +33,30 @@ public class Game {
         Runtime = runtime;
 
         world = new World(runtime);
+        TouchGamepad = new TouchGamepad(this);
+
+        InputManager = new InputManager(this);
     }
 
     public void init() {
         Runtime.Platform.log("Initializing game");
 
-        loadingResult = WorldLoader.Instance.load(Runtime, world, "test");
+        loadingResult = WorldLoader.Instance.load(this, world, "test");
 
         tex = Runtime.ResourceManager.getTexture("textures/brick.tex");
-
-        font = BitmapFont.load(Runtime, "font/default.font");
     }
 
     public void update() {
         if(loadingResult != null && loadingResult.isDone()) {
-            if(!loadingResult.isSuccessful())
-                throw new RuntimeException("Loading task cancelled due to exception");
-            else
+            if(loadingResult.isSuccessful())
                 loadingResult = null;
         }
 
         world.update();
+    }
+
+    public void drawUI() {
+        TouchGamepad.drawUI();
     }
 
     public void draw() {

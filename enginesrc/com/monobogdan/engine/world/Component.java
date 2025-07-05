@@ -2,10 +2,9 @@ package com.monobogdan.engine.world;
 
 import com.monobogdan.engine.Camera;
 import com.monobogdan.engine.Graphics;
-import com.monobogdan.engine.world.GameObject;
 
 public abstract class Component {
-    protected GameObject Parent;
+    public GameObject Parent;
 
     public boolean Active;
 
